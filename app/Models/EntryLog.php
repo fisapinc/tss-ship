@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EntryLog extends Model
 {
     protected $fillable = [ 
-        //'emission_entry_id', 
+        'parent_id', 
         'status_id', 
         'remarks'
     ];
