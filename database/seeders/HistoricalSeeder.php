@@ -8,14 +8,82 @@ use Illuminate\Support\Facades\DB;
 
 class HistoricalSeeder extends Seeder
 {
+    private $vesselTypes = ['PASSENGER', 'CARGO', 'TANKER', 'FISHING', 'SAILING', 'HSC', 'TUG', 'OTHER'];
+    private $flags = ['MY', 'SG', 'ID', 'TH', 'VN', 'PH', 'US', 'GB', 'JP', 'KR'];
+    private $entrySectors = ['1', '2', '3', '4'];
+    private $directions = ['1', '2', '3', '4'];
+    private $hazardousOptions = ['Y', 'N'];
     
     public function run(): void
     {
-         DB::table('historicals')->insert([
-            ['id' => 1, 'mmsi_number' => '229136000', 'vessel_name' => 'CARNIVAL SPIRIT', 'vessel_type'=> 'PASSENGER', 'call_sign' => '9HA3097', 'imo_number' => '9134567' , 'imo_classes' => '', 'draught' => '12345678', 'air_draught' => '39823421', 'total_person_onboard' => '200', 'flag' => 'MY', 'date_arrival' => '22/11/2024', 'time_arrival' => '23:11:12', 'entry_sector' => '1', 'direction' => '1', 'position' => '', 'port_desination' => '', 'speed' => '', 'course' => '', 'hazardous_cargo' => 'N', 'quantity' => '1', 'description' => 'LOREM IPSUM', 'comments' => 'LOREM IPSUM', 'rule_10' => 'LOREM IPSUM', 'vessel_email' => 'LOREM IPSUM', 'internal_remark' => 'LOREM IPSUM'],
-            ['id' => 2, 'mmsi_number' => '19246858', 'vessel_name' => 'MAGENTA FIGHT', 'vessel_type'=> 'PASSENGER', 'call_sign' => '9HA3089', 'imo_number' => '248685' , 'imo_classes' => '', 'draught' => '2845489', 'air_draught' => '578585', 'total_person_onboard' => '900', 'flag' => 'MY', 'date_arrival' => '22/11/2024', 'time_arrival' => '23:11:12', 'entry_sector' => '1', 'direction' => '1', 'position' => '', 'port_desination' => '', 'speed' => '', 'course' => '','hazardous_cargo' => 'N', 'quantity' => '1', 'description' => 'LOREM IPSUM', 'comments' => 'LOREM IPSUM', 'rule_10' => 'LOREM IPSUM', 'vessel_email' => 'LOREM IPSUM', 'internal_remark' => 'LOREM IPSUM' ],
-            ['id' => 3, 'mmsi_number' => '5868484', 'vessel_name' => 'A1 CAUGHT', 'vessel_type'=> 'PASSENGER', 'call_sign' => '9HA3078', 'imo_number' => '686848' , 'imo_classes' => '', 'draught' => '2838458', 'air_draught' => '044849', 'total_person_onboard' => '100', 'flag' => 'MY', 'date_arrival' => '22/11/2024', 'time_arrival' => '23:11:12', 'entry_sector' => '1', 'direction' => '1', 'position' => '', 'port_desination' => '', 'speed' => '', 'course' => '','hazardous_cargo' => 'N', 'quantity' => '1', 'description' => 'LOREM IPSUM', 'comments' => 'LOREM IPSUM', 'rule_10' => 'LOREM IPSUM', 'vessel_email' => 'LOREM IPSUM', 'internal_remark' => 'LOREM IPSUM' ],
-        ]);
+        $records = [];
         
+        for ($i = 1; $i <= 100; $i++) {
+            $vesselType = $this->vesselTypes[array_rand($this->vesselTypes)];
+            $flag = $this->flags[array_rand($this->flags)];
+            $entrySector = $this->entrySectors[array_rand($this->entrySectors)];
+            $direction = $this->directions[array_rand($this->directions)];
+            $hazardous = $this->hazardousOptions[array_rand($this->hazardousOptions)];
+            
+            $records[] = [
+                'id' => $i,
+                'mmsi_number' => rand(100000000, 999999999),
+                'vessel_name' => $this->generateVesselName(),
+                'vessel_type' => $vesselType,
+                'call_sign' => $this->generateCallSign(),
+                'imo_number' => rand(100000, 9999999),
+                'imo_classes' => '',
+                'draught' => rand(1000000, 99999999),
+                'air_draught' => rand(100000, 99999999),
+                'total_person_onboard' => rand(10, 3000),
+                'flag' => $flag,
+                'date_arrival' => $this->generateRandomDate(),
+                'time_arrival' => $this->generateRandomTime(),
+                'entry_sector' => $entrySector,
+                'direction' => $direction,
+                'position' => '',
+                'port_desination' => '',
+                'speed' => rand(5, 30),
+                'course' => rand(0, 359),
+                'hazardous_cargo' => $hazardous,
+                'quantity' => $hazardous === 'Y' ? rand(1, 100) : 0,
+                'description' => 'LOREM IPSUM',
+                'comments' => 'LOREM IPSUM',
+                'rule_10' => 'LOREM IPSUM',
+                'vessel_email' => 'vessel'.$i.'@example.com',
+                'internal_remark' => 'LOREM IPSUM'
+            ];
+        }
+        
+        DB::table('historicals')->insert($records);
+    }
+    
+    private function generateVesselName(): string
+    {
+        $prefixes = ['CARNIVAL', 'ROYAL', 'MAGENTA', 'OCEAN', 'SEA', 'GOLDEN', 'SILVER', 'PACIFIC', 'ATLANTIC', 'ARCTIC'];
+        $suffixes = ['SPIRIT', 'PRINCESS', 'EXPLORER', 'VOYAGER', 'HORIZON', 'SUNRISE', 'STAR', 'MOON', 'WAVE', 'JOURNEY'];
+        return $prefixes[array_rand($prefixes)] . ' ' . $suffixes[array_rand($suffixes)];
+    }
+    
+    private function generateCallSign(): string
+    {
+        $letters = range('A', 'Z');
+        $numbers = range(0, 9);
+        return $letters[array_rand($letters)] . $letters[array_rand($letters)] . 
+               $numbers[array_rand($numbers)] . $numbers[array_rand($numbers)] . 
+               $letters[array_rand($letters)] . $letters[array_rand($letters)];
+    }
+    
+    private function generateRandomDate(): string
+    {
+        $start = strtotime('2023-01-01');
+        $end = strtotime('2024-12-31');
+        $timestamp = mt_rand($start, $end);
+        return date('d/m/Y', $timestamp);
+    }
+    
+    private function generateRandomTime(): string
+    {
+        return sprintf('%02d:%02d:%02d', rand(0, 23), rand(0, 59), rand(0, 59));
     }
 }

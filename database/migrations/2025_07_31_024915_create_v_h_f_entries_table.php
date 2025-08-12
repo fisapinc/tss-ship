@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('entry_sector');
             $table->boolean('direction');
             $table->string('position');
-            $table->string('port_desination');
+            $table->string('port_destination');
             $table->string('speed');
             $table->string('course');
             $table->string('hazardous_cargo');
