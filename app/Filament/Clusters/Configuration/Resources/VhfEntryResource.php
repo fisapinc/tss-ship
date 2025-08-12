@@ -18,6 +18,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\{Grid, Select, TextInput, Repeater, Section, Group, Placeholder, DatePicker, Toggle, TimePicker, Radio};
 use Filament\Support\Enums\VerticalAlignment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Filament\Notifications\Notification;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 class VhfEntryResource extends Resource
 {
@@ -73,17 +77,67 @@ class VhfEntryResource extends Resource
                                             ->label('Search')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->button()
-                                            ->action(function (array $data, \Filament\Forms\Set $set) {
-                                                $record = \App\Model\Vhfentry::query()
-                                                ->where('mmsi_number', $data['search_mmsi_number'])
-                                                ->whereDate('date_arrival', $data['seach_date_arrival'])
-                                                ->first();
+                                            ->action(function (Get $get, Set $set) {
+                                                $mmsiInput = trim((string) $get('search_mmsi_number'));
 
-                                                // if ($record) {
-                                                //     $set('vessel_name', $record->vessel_name);
-                                                //     $set('mmsi_number', $record->mmsi_number);
-                                                //     $set('call_sign', $record->call_sign);
-                                                // }
+                                                if ($mmsiInput === '') {
+                                                    Notification::make()
+                                                        ->title('Please enter an MMSI number')
+                                                        ->danger()
+                                                        ->send();
+                                                    return;
+                                                }
+
+                                                $row = DB::connection('pnav')->selectOne(
+                                                    'SELECT mmsi, shipname, s.callsign, 
+                                                    imoshipno, flagname, yardnumber, officialnumber,
+                                                    portofregistry, l.length, deadweight, grosstonnage, nettonnage, breadthextreme,
+                                                    l.depth, draught
+                                                    FROM public.ais_static AS s
+                                                    JOIN public.ais_lloyds AS l
+                                                      ON s.mmsi = l.maritimemobileserviceidentitymmsinumber
+                                                    WHERE mmsi = ? LIMIT 1',
+                                                    [ $mmsiInput ]
+                                                );
+
+                                                if (!$row) {
+                                                    Notification::make()
+                                                        ->title('No vessel found for the provided MMSI')
+                                                        ->danger()
+                                                        ->send();
+                                                    return;
+                                                }
+
+                                                // show result $row
+                                                $summary = "MMSI: " . ($row->mmsi ?? '-') . "\n"
+                                                    . "Ship: " . ($row->shipname ?? '-') . "\n"
+                                                    . "Callsign: " . ($row->callsign ?? '-') . "\n"
+                                                    . "IMO: " . ($row->imoshipno ?? '-') . "\n"
+                                                    . "Flag: " . ($row->flagname ?? '-') . "\n"
+                                                    . "Length: " . ($row->length ?? '-') . "\n"
+                                                    . "Draught: " . ($row->draught ?? '-');
+
+                                                // Log full row for deeper inspection
+                                                logger()->info('PNAV ais_static row', (array) $row);
+
+                                                // Notification::make()
+                                                //     ->title('Search Result')
+                                                //     ->body($summary)
+                                                //     ->info()
+                                                //     ->send();
+
+                                                // Map PNAV fields to form fields
+                                                $set('vessel_name', $row->shipname ?? null);
+                                                $set('mmsi_number', isset($row->mmsi) ? (string) $row->mmsi : null);
+                                                $set('call_sign', $row->callsign ?? null);
+                                                $set('imo_number', isset($row->imoshipno) ? (string) $row->imoshipno : null);
+                                                $set('flag', $row->flagname ?? null);
+                                                $set('draught', isset($row->draught) ? number_format((float) $row->draught, 3) : null);
+
+                                                Notification::make()
+                                                    ->title('Vessel data loaded from PNAV')
+                                                    ->success()
+                                                    ->send();
                                             }),
                                     ])->columnSpan(2)
                                     ->verticalAlignment(VerticalAlignment::End),
@@ -112,17 +166,23 @@ class VhfEntryResource extends Resource
                         Section::make('Route Information')
                             ->schema([
                                 DatePicker::make('date_arrival')
-                                ->label('Date Arrival')
-                                ->native(false) 
-                                ->displayFormat('Y-m-d')->columnSpan(6),
+                                    ->label('Date Arrival')
+                                    ->required()
+                                    ->native(false)
+                                    ->displayFormat('Y-m-d')
+                                    ->columnSpan(6),
                                 TimePicker::make('time_arrival')
-                                ->label('Time Arrival')->columnSpan(6),
+                                    ->label('Time Arrival')
+                                    ->required()
+                                    ->columnSpan(6),
                                 TextInput::make('entry_sector')->label('Entry Sector')->required()->maxLength(50)->columnSpan(6),
-                                Radio::make('direction')->label('Direction')->required()
-                                ->options([
-                                    'eastbound' => 'Eastbound',
-                                    'westbound' => 'Westbound',
-                                ])
+                                Radio::make('direction')
+                                    ->label('Direction')
+                                    ->required()
+                                    ->options([
+                                        1 => 'Eastbound',
+                                        0 => 'Westbound',
+                                    ])
                                 ->inline()
                                 ->inlineLabel(false)
                                 ->columnSpan(6),

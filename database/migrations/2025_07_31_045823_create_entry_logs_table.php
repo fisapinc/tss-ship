@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('entry_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->constrained('vhf_entries');
+            $table->foreignId('vhf_entry_id')->index();
             $table->foreignId('status_id')->constrained('statuses');
             $table->string('remarks');
             $table->timestamps();
