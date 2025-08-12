@@ -22,7 +22,7 @@ use Filament\Tables\Actions\Action;
 class EntryReportResource extends Resource
 {
     protected static ?string $model = Historical::class;
-    protected static ?string $navigationLabel = 'Submission';
+    protected static ?string $navigationLabel = 'Other Than AIS';
     protected static ?string $navigationIcon = 'heroicon-o-list-bullet';
     protected static ?string $cluster = Configuration::class;
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
