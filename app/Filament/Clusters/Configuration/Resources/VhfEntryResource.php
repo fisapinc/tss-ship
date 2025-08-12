@@ -89,7 +89,7 @@ class VhfEntryResource extends Resource
                                                 }
 
                                                 $row = DB::connection('pnav')->selectOne(
-                                                    'SELECT mmsi, shipName, s.callsign, 
+                                                    'SELECT mmsi, shipname, s.callsign, 
                                                     imoshipno, flagname, yardnumber, officialnumber,
                                                     portofregistry, l.length, deadweight, grosstonnage, nettonnage, breadthextreme,
                                                     l.depth, draught
@@ -110,7 +110,7 @@ class VhfEntryResource extends Resource
 
                                                 // show result $row
                                                 $summary = "MMSI: " . ($row->mmsi ?? '-') . "\n"
-                                                    . "Ship: " . ($row->shipName ?? '-') . "\n"
+                                                    . "Ship: " . ($row->shipname ?? '-') . "\n"
                                                     . "Callsign: " . ($row->callsign ?? '-') . "\n"
                                                     . "IMO: " . ($row->imoshipno ?? '-') . "\n"
                                                     . "Flag: " . ($row->flagname ?? '-') . "\n"
@@ -120,19 +120,19 @@ class VhfEntryResource extends Resource
                                                 // Log full row for deeper inspection
                                                 logger()->info('PNAV ais_static row', (array) $row);
 
-                                                Notification::make()
-                                                    ->title('Search Result')
-                                                    ->body($summary)
-                                                    ->info()
-                                                    ->send();
+                                                // Notification::make()
+                                                //     ->title('Search Result')
+                                                //     ->body($summary)
+                                                //     ->info()
+                                                //     ->send();
 
                                                 // Map PNAV fields to form fields
-                                                $set('vessel_name', $row->shipName ?? null);
+                                                $set('vessel_name', $row->shipname ?? null);
                                                 $set('mmsi_number', isset($row->mmsi) ? (string) $row->mmsi : null);
                                                 $set('call_sign', $row->callsign ?? null);
                                                 $set('imo_number', isset($row->imoshipno) ? (string) $row->imoshipno : null);
                                                 $set('flag', $row->flagname ?? null);
-                                                $set('draught', isset($row->draught) ? (string) $row->draught : null);
+                                                $set('draught', isset($row->draught) ? number_format((float) $row->draught, 3) : null);
 
                                                 Notification::make()
                                                     ->title('Vessel data loaded from PNAV')
