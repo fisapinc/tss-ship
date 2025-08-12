@@ -11,13 +11,17 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call([
+            RoleSeeder::class,
+            StatusSeeder::class,
+        ]);
 
         User::create([
-        'name' => 'Authority',
-        'email' => 'authority@example.com',
-        'password' => Hash::make('password'), 
-        'contact_info' => '01112345678',
-        'user_type' => 1,
+            'name' => 'Authority',
+            'email' => 'authority@example.com',
+            'password' => Hash::make('password'),
+            'contact_info' => '01112345678',
+            'user_type' => 1,
         ]);
     }
 }
