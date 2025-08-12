@@ -27,6 +27,9 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'contact_info' => fake()->numerify('###########'),
+            // Ensure a valid role id; RoleSeeder seeds id 1 as 'Authority'
+            'user_type' => 1,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];

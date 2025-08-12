@@ -112,17 +112,23 @@ class VhfEntryResource extends Resource
                         Section::make('Route Information')
                             ->schema([
                                 DatePicker::make('date_arrival')
-                                ->label('Date Arrival')
-                                ->native(false) 
-                                ->displayFormat('Y-m-d')->columnSpan(6),
+                                    ->label('Date Arrival')
+                                    ->required()
+                                    ->native(false)
+                                    ->displayFormat('Y-m-d')
+                                    ->columnSpan(6),
                                 TimePicker::make('time_arrival')
-                                ->label('Time Arrival')->columnSpan(6),
+                                    ->label('Time Arrival')
+                                    ->required()
+                                    ->columnSpan(6),
                                 TextInput::make('entry_sector')->label('Entry Sector')->required()->maxLength(50)->columnSpan(6),
-                                Radio::make('direction')->label('Direction')->required()
-                                ->options([
-                                    'eastbound' => 'Eastbound',
-                                    'westbound' => 'Westbound',
-                                ])
+                                Radio::make('direction')
+                                    ->label('Direction')
+                                    ->required()
+                                    ->options([
+                                        1 => 'Eastbound',
+                                        0 => 'Westbound',
+                                    ])
                                 ->inline()
                                 ->inlineLabel(false)
                                 ->columnSpan(6),
