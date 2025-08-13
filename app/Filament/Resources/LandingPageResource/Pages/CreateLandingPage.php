@@ -10,8 +10,20 @@ class CreateLandingPage extends CreateRecord
 {
     protected static string $resource = LandingPageResource::class;
 
-    public function getTitle(): string
-    {
+    public function getTitle(): string {
         return 'Ship Entry Report';
     }
+
+    // public function getMaxContentWidth(): string {
+    //     return 'full';
+    // }
+
+    protected function getCreateFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction()->label('Submit'),
+        ];
+    }
+
+
 }
