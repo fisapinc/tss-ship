@@ -55,13 +55,13 @@ class EntryReportResource extends Resource
                 ->toggleable(),
                 TextColumn::make('date_arrival')
                 ->label('Date of Arrival')
-                ->date()
+                ->date('d/m/Y')
                 ->sortable()
                 ->toggleable(),
                 TextColumn::make('entry_sector')
                 ->label('Entry Sector')
                 ->toggleable(),
-                Textcolumn::make('reporting_method')
+                Textcolumn::make('reportingMethod.name')
                 ->label('Reporting Method')
                 ->toggleable(),
                 TextColumn::make('status')->label('Status')->badge()
