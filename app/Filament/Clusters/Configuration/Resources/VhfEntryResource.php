@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Tapp\FilamentCountryCodeField\Forms\Components\CountryCodeSelect;
 
 class VhfEntryResource extends Resource
 {
@@ -59,14 +60,14 @@ class VhfEntryResource extends Resource
                                 Grid::make(12)->schema([
                                     TextInput::make('search_mmsi_number')
                                         ->label('MMSI Number')
-                                        //->required()
+                                        ////->required()
                                         ->maxLength(50)
                                         ->columnSpan(5)
                                         ->dehydrated(false),
 
                                     DatePicker::make('search_date_arrival')
                                         ->label('Date of Arrival')
-                                        //->required()
+                                        ////->required()
                                         ->native(false)
                                         ->displayFormat('Y-m-d')
                                         ->columnSpan(5)
@@ -143,39 +144,65 @@ class VhfEntryResource extends Resource
                                     ->verticalAlignment(VerticalAlignment::End),
                                 ])
                             ])
-                            //->collapsible()
                             ->persistCollapsed(),
 
                         Section::make('Ship Details')
                             ->schema([
-                                TextInput::make('vessel_name')->label('Vessel Name')->required()->maxLength(50)->columnSpan(6),
+                                Grid::make(12)
+                                ->schema([
+                                TextInput::make('vessel_name')->label('Vessel Name')
+                                ->required()
+                                ->maxLength(50)
+                                ->columnSpan(6),
                                 TextInput::make('mmsi_number')
                                         ->label('MMSI Number')
                                         ->required()
                                         ->maxLength(50)
                                         ->columnSpan(6),
-                                TextInput::make('call_sign')->label('Call Sign')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('imo_number')->label('IMO Number')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('draught')->label('Draught')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('air_draught')->label('Air Draught')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('total_person_onboard')->label('Total Person Onboard')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('flag')->label('Flag')->required()->maxLength(50)->columnSpan(6),
-                            ]),
+                                TextInput::make('call_sign')->label('Call Sign')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('imo_number')->label('IMO Number')
+                                //->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('draught')->label('Draught')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('air_draught')->label('Air Draught')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('total_person_onboard')->label('Total Person Onboard')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                CountryCodeSelect::make('flag')->label('Flag')//->required()
+                                ->columnSpan(6),
+                            ])
+                ]),
 
                         
                         Section::make('Route Information')
                             ->schema([
+                                Grid::make(12)
+                                ->schema([
                                 DatePicker::make('date_arrival')
                                     ->label('Date Arrival')
-                                    ->required()
+                                    //->required()
                                     ->native(false)
                                     ->displayFormat('Y-m-d')
                                     ->columnSpan(6),
                                 TimePicker::make('time_arrival')
                                     ->label('Time Arrival')
-                                    ->required()
+                                    //->required()
                                     ->columnSpan(6),
-                                TextInput::make('entry_sector')->label('Entry Sector')->required()->maxLength(50)->columnSpan(6),
+                                Select::make('entry_sector')
+                                ->label('Entry Sector')
+                                ->options([
+                                    '1' => '1',
+                                    '2' => '2',
+                                    '3' => '3',
+                                    '4' => '4',
+                                    '5' => '5',
+                                    '6' => '6',
+                                ])
+                                //->required()
+                                //->maxLength(50)
+                                ->columnSpan(6),
                                 Radio::make('direction')
                                     ->label('Direction')
                                     ->required()
@@ -183,29 +210,54 @@ class VhfEntryResource extends Resource
                                         1 => 'Eastbound',
                                         0 => 'Westbound',
                                     ])
+                                ->default(0)
                                 ->inline()
                                 ->inlineLabel(false)
                                 ->columnSpan(6),
-                                TextInput::make('position')->label('Position')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('port_destination')->label('Port of Destination')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('speed')->label('Speed')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('course')->label('Course')->required()->maxLength(50)->columnSpan(6),
-                                TextInput::make('vessel_type')->label('Vessel Type')->required()->maxLength(50)->columnSpan(6),
-                            ]),
+                                TextInput::make('position')->label('Position')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('port_destination')->label('Port of Destination')
+                                //->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('speed')->label('Speed')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('course')->label('Course')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                TextInput::make('vessel_type')->label('Vessel Type')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                            ])
+                                ]),
 
                         
                         Section::make('Cargo Information')
                             ->schema([
-                                TextInput::make('imo_classes')->label('IMO Classes')->required()->maxLength(50)->columnSpan(6),
-                                Radio::make('hazardous_cargo')->label('Hazardous Cargo')->required()->boolean()->inline()
-                                ->inlineLabel(false)->columnSpan(6),
-                                TextInput::make('quantity')->label('Quantity')->required()->maxLength(50)->columnSpan(6),
+                                Grid::make(12)
+                                ->schema([
+                                TextInput::make('imo_classes')->label('IMO Classes')//->required()
+                                ->maxLength(50)->columnSpan(6),
+                                Radio::make('hazardous_cargo')
+                                ->label('Hazardous Cargo')
+                                ->options([
+                                        1 => 'Yes',
+                                        0 => 'No',
+                                ])
+                                ->default(0)
+                                ->inline()
+                                ->inlineLabel(false)
+                                ->columnSpan(6),
+                                TextInput::make('quantity')->label('Quantity')//->required()
+                                ->maxLength(50)->columnSpan(6),
                                 TextInput::make('description')->label('Description')->maxLength(50)->columnSpan(6),
                                 TextInput::make('comments')->label('Defects, Deficiencies & Other Comments')->maxLength(50)->columnSpan(6),
                                 TextInput::make('rule_10')->label('Rule 10 TSS and Rule 10 COLREG')->maxLength(50)->columnSpan(6),
                                 TextInput::make('vessel_email')->label('Vessel e-mail')->maxLength(50)->columnSpan(6),
                                 TextInput::make('internal_remark')->label('Internal Remark')->maxLength(50)->columnSpan(6),
-                            ]),
+                                // TextInput::make('status_id')
+                                // ->default('Pending')
+                                // ->hidden()
+                                // ->dehydrated(true),
+                            ])
+                ]),
 
                         
                     ])->columnSpan(8),
@@ -214,8 +266,19 @@ class VhfEntryResource extends Resource
                         Section::make('Status')
                             ->schema([
                                 Placeholder::make('status_id')->label('Status')
-                                    ->content(fn($record) => $record?->status_id),
-                                    //->visibleOn('edit'),
+                                // ->badge()
+                                // ->color(fn(string $state): string => match ($state) {
+                                //     'Pending' => 'warning',
+                                //     'Unverified' => 'danger',
+                                //     'Verified' => 'success',
+                                //     default => 'warning',
+                                // })
+                                     ->content(function ($record) {
+                                    if (!$record || !$record->status_id) {
+                                        return 'Pending';
+                                    }
+                                    return $record->status?->name ?? 'Pending';
+                                }),
 
                                 Toggle::make('verify')
                                     ->label('Verify')
@@ -229,24 +292,24 @@ class VhfEntryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
+    // public static function table(Table $table): Table
+    // {
+    //     return $table
+    //         ->columns([
+    //             //
+    //         ])
+    //         ->filters([
+    //             //
+    //         ])
+    //         ->actions([
+    //             Tables\Actions\EditAction::make(),
+    //         ])
+    //         ->bulkActions([
+    //             Tables\Actions\BulkActionGroup::make([
+    //                 Tables\Actions\DeleteBulkAction::make(),
+    //             ]),
+    //         ]);
+    // }
 
     public static function getRelations(): array
     {
