@@ -34,5 +34,6 @@ class VhfEntry extends Model
         'rule_10',
         'vessel_email',
         'internal_remark',
+        'attachment'
     ];
 }
