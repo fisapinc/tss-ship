@@ -21,7 +21,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'authority@example.com',
             'password' => Hash::make('password'),
             'contact_info' => '01112345678',
-            'user_type' => 1,
+            //'user_type' => 1,
         ]);
+
+        $this->call([
+        ReportingMethodSeeder::class,
+        HistoricalSeeder::class,
+    ]);
+    
     }
 }

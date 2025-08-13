@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class HistoricalSeeder extends Seeder
 {
@@ -16,9 +17,19 @@ class HistoricalSeeder extends Seeder
     
     public function run(): void
     {
+        $reportingMethodIds = DB::table('reporting_methods')->pluck('id')->toArray();
+        
+        if (empty($reportingMethodIds)) {
+            $this->command->error('No reporting methods found! Run ReportingMethodSeeder first.');
+            return;
+        }
+
         $records = [];
         
         for ($i = 1; $i <= 100; $i++) {
+            $reportingMethodId = $reportingMethodIds[array_rand($reportingMethodIds)];
+            $reporting_method_id = $reportingMethodIds[array_rand($reportingMethodIds)];
+
             $vesselType = $this->vesselTypes[array_rand($this->vesselTypes)];
             $flag = $this->flags[array_rand($this->flags)];
             $entrySector = $this->entrySectors[array_rand($this->entrySectors)];
@@ -42,7 +53,7 @@ class HistoricalSeeder extends Seeder
                 'entry_sector' => $entrySector,
                 'direction' => $direction,
                 'position' => '',
-                'port_desination' => '',
+                'port_destination' => '',
                 'speed' => rand(5, 30),
                 'course' => rand(0, 359),
                 'hazardous_cargo' => $hazardous,
@@ -51,7 +62,10 @@ class HistoricalSeeder extends Seeder
                 'comments' => 'LOREM IPSUM',
                 'rule_10' => 'LOREM IPSUM',
                 'vessel_email' => 'vessel'.$i.'@example.com',
-                'internal_remark' => 'LOREM IPSUM'
+                'internal_remark' => 'LOREM IPSUM',
+                'reporting_method_id' => $reporting_method_id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ];
         }
         
@@ -77,9 +91,9 @@ class HistoricalSeeder extends Seeder
     private function generateRandomDate(): string
     {
         $start = strtotime('2023-01-01');
-        $end = strtotime('2024-12-31');
+        $end = strtotime('2025-07-31');
         $timestamp = mt_rand($start, $end);
-        return date('d/m/Y', $timestamp);
+        return date('Y-m-d', $timestamp);
     }
     
     private function generateRandomTime(): string
